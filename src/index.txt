@@ -1,0 +1,115 @@
+import React, { useState } from "react";
+import axios from "axios";
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState("building");
+  const [buildingName, setBuildingName] = useState("");
+  const [yearBuilt, setYearBuilt] = useState("");
+  const [floors, setFloors] = useState("");
+  const [material, setMaterial] = useState("");
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState([]);
+
+  // Validation function
+  const validate = () => {
+    const errs = [];
+    const year = parseInt(yearBuilt);
+    const floorNum = parseInt(floors);
+    const currentYear = new Date().getFullYear();
+
+    if (!buildingName.trim()) {
+      errs.push("Building Name is required.");
+    }
+    if (!yearBuilt || isNaN(year) || year < 1900 || year > currentYear) {
+      errs.push(`Year Built must be a number between 1900 and ${currentYear}.`);
+    }
+    if (!floors || isNaN(floorNum) || floorNum < 1 || floorNum > 100) {
+      errs.push("Floors must be a number between 1 and 100.");
+    }
+    if (!material.trim()) {
+      errs.push("Material is required.");
+    }
+
+    return errs;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (validationErrors.length > 0) {
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:5000/building", {
+        building_name: buildingName,
+        year_built: parseInt(yearBuilt),
+        floors: parseInt(floors),
+        material,
+      });
+      setMessage("Building added successfully!");
+      setBuildingName("");
+      setYearBuilt("");
+      setFloors("");
+      setMaterial("");
+      setErrors([]);
+    } catch (err) {
+      setMessage("Error adding building.");
+    }
+  };
+
+  return (
+    <main style={{ padding: "2rem", maxWidth: "600px", margin: "auto" }}>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>Bathroom Usage Manager</h1>
+
+      <div>
+        <button onClick={() => setActiveTab("building")} style={{ marginBottom: "1rem" }}>
+          Add Building
+        </button>
+
+        {activeTab === "building" && (
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <input
+              type="text"
+              placeholder="Building Name"
+              value={buildingName}
+              onChange={(e) => setBuildingName(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Year Built"
+              value={yearBuilt}
+              onChange={(e) => setYearBuilt(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Floors"
+              value={floors}
+              onChange={(e) => setFloors(e.target.value)}
+              min={1}
+              max={100}
+            />
+            <input
+              type="text"
+              placeholder="Material"
+              value={material}
+              onChange={(e) => setMaterial(e.target.value)}
+            />
+            <button type="submit">Submit</button>
+            {errors.length > 0 && (
+              <ul style={{ color: "red" }}>
+                {errors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            )}
+            {message && <p style={{ color: message.startsWith("Error") ? "red" : "green" }}>{message}</p>}
+          </form>
+        )}
+      </div>
+    </main>
+  );
+}
