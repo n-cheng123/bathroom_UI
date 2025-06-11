@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_BASE } from './config';
 
 function Residents() {
   const [residents, setResidents] = useState([]);
@@ -13,7 +14,7 @@ function Residents() {
 
   const fetchResidents = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/residents");
+      const res = await axios.get(`${API_BASE}/residents`);
       setResidents(res.data);
     } catch (err) {
       setError("Failed to fetch residents.");
@@ -24,7 +25,7 @@ function Residents() {
     if (!window.confirm("Are you sure you want to delete this resident?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/residents/${residentId}`);
+      await axios.delete(`${API_BASE}/residents/${residentId}`);
       fetchResidents();
     } catch (err) {
       setError("Failed to delete resident.");
@@ -62,7 +63,7 @@ function EditResident() {
   const { id } = useParams();
 
   useEffect(() => {
-    axios.get("http://localhost:5000/residents/" + id)
+    axios.get(`${API_BASE}/residents/` + id)
       .then(res => {
         setName(res.data.name);
         setStudentId(res.data.student_id);
@@ -73,7 +74,7 @@ function EditResident() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put("http://localhost:5000/residents/" + id, {
+      await axios.put(`${API_BASE}/residents/` + id, {
         name,
         student_id: studentId
       });
@@ -108,7 +109,7 @@ function AddResident() {
     setError("");
 
     try {
-      await axios.post("http://localhost:5000/residents", {
+      await axios.post(`${API_BASE}/residents`, {
         student_id: studentId,
         name,
       });

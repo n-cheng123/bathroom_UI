@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_BASE } from './config';
 
 export function Home() {
   const [buildingName, setBuildingName] = useState("");
@@ -14,7 +15,7 @@ export function Home() {
 
   const fetchBuildings = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/building");
+      const res = await axios.get(`${API_BASE}/building`);
       setBuildings(res.data);
     } catch {
       setMessage("Failed to load buildings.");
@@ -50,7 +51,7 @@ export function Home() {
     if (validationErrors.length > 0) return;
 
     try {
-      await axios.post("http://localhost:5000/building", {
+      await axios.post(`${API_BASE}/building`, {
         building_name: buildingName,
         year_built: parseInt(yearBuilt),
         floors: parseInt(floors),
@@ -70,7 +71,7 @@ export function Home() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this building?")) return;
     try {
-      await axios.delete(`http://localhost:5000/building/${id}`);
+      await axios.delete(`${API_BASE}/building/${id}`);
       fetchBuildings();
     } catch {
       setMessage("Failed to delete building.");
@@ -113,7 +114,7 @@ export function EditBuilding() {
   const { id } = useParams();
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/building/${id}`)
+    axios.get(`${API_BASE}/building/${id}`)
       .then((res) => {
         setBuildingName(res.data.building_name);
         setYearBuilt(res.data.year_built);
@@ -126,7 +127,7 @@ export function EditBuilding() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/building/${id}`, {
+      await axios.put(`${API_BASE}/building/${id}`, {
         building_name: buildingName,
         year_built: parseInt(yearBuilt),
         floors: parseInt(floors),

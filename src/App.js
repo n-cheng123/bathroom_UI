@@ -10,6 +10,7 @@ import { Home, EditBuilding } from "./Building";
 import { Residents, AddResident, EditResident } from "./Residents";
 import { BathroomList, AddBathroom, EditBathroom } from "./Bathroom";
 
+
 export default function App() {
   return (
     <Router>

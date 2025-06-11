@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_BASE } from './config';
 
-function BathroomList() {
+export function BathroomList() {
   const [bathrooms, setBathrooms] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate(); 
 
   const fetchBathrooms = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/bathroom");
+      const res = await axios.get(`${API_BASE}/bathroom`);
       setBathrooms(res.data);
     } catch {
       setError("Failed to load bathrooms.");
@@ -23,7 +24,7 @@ function BathroomList() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this bathroom?")) return;
     try {
-      await axios.delete(`http://localhost:5000/bathroom/${id}`);
+      await axios.delete(`${API_BASE}/bathroom/${id}`);
       fetchBathrooms(); 
     } catch {
       setError("Failed to delete bathroom.");
@@ -46,7 +47,7 @@ function BathroomList() {
             Gender: {
               b.gender_typ === "M" ? "Male" :
               b.gender_typ === "F" ? "Female" :
-              b.gender_typ === "A" ? "All Gender" :
+              b.gender_typ === "U" ? "All Gender" :
               b.gender_typ
             }
           <button onClick={() => navigate(`/edit-bathroom/${b.bathroom_id}`)} style={{ marginLeft: "1rem" }}>Edit</button>
@@ -59,7 +60,7 @@ function BathroomList() {
 }
 
 
-function AddBathroom() {
+export function AddBathroom() {
   const [floorId, setFloorId] = useState("");
   const [totalStalls, setTotalStalls] = useState("");
   const [totalShowers, setTotalShowers] = useState("");
@@ -70,7 +71,7 @@ function AddBathroom() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/bathroom", {
+      await axios.post(`${API_BASE}/bathroom`, {
         floor_id: parseInt(floorId),
         total_stalls: parseInt(totalStalls),
         total_showers: parseInt(totalShowers),
@@ -129,7 +130,7 @@ function AddBathroom() {
   );
 }
 
-function EditBathroom() {
+export function EditBathroom() {
   const { id } = useParams();
   const [floorId, setFloorId] = useState("");
   const [totalStalls, setTotalStalls] = useState("");
@@ -139,7 +140,7 @@ function EditBathroom() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/bathroom/${id}`)
+    axios.get(`${API_BASE}/bathroom/${id}`)
       .then((res) => {
         setFloorId(res.data.floor_id);
         setTotalStalls(res.data.total_stalls);
@@ -152,7 +153,7 @@ function EditBathroom() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/bathroom/${id}`, {
+      await axios.put(`${API_BASE}/bathroom/${id}`, {
         floor_id: parseInt(floorId),
         total_stalls: parseInt(totalStalls),
         total_showers: parseInt(totalShowers),
@@ -205,5 +206,4 @@ function EditBathroom() {
     </div>
   );
 }
-
-export { BathroomList, AddBathroom, EditBathroom };
+export default BathroomList;
